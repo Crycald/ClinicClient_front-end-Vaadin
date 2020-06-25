@@ -4,6 +4,7 @@ import com.client.frontend.api.Client;
 import com.client.frontend.api.domain.Customer;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
@@ -33,8 +34,13 @@ public class CustomerRegistrationPage extends Div {
     private PasswordField passwordField;
     private EmailField emailField;
     private TextField phoneNumberField; //textfield cuz numberfield converts input to sth like 34324324230B.431
+    private TextField acceptTextField;
+    private Text contentText;
     private Button signInButton;
     private Button previousPageButton;
+    private Button termsOfServicesButton;
+    private Button acceptButton;
+    private Dialog contentDialog;
     private Dialog popUpDialog;
 
     private Client client;
@@ -100,9 +106,11 @@ public class CustomerRegistrationPage extends Div {
         setFormForPhoneNumberField();
         setFormForSignInButton();
         setFormForPreviousPageButton();
+        setFormForTermsOfServicesButton();
 
         HorizontalLayout horizontalLayout = new HorizontalLayout(previousPageButton, signInButton);
-        VerticalLayout verticalLayout = new VerticalLayout(firstNameField, lastNameField, loginField, passwordField, emailField, phoneNumberField, horizontalLayout);
+        VerticalLayout verticalLayout = new VerticalLayout(firstNameField, lastNameField, loginField,
+                passwordField, emailField, phoneNumberField, termsOfServicesButton, horizontalLayout);
 
         add(verticalLayout);
     }
@@ -144,8 +152,8 @@ public class CustomerRegistrationPage extends Div {
 
     private void setFormForSignInButton() {
         signInButton = new Button("Sign in");
-        signInButton.addClickListener(this::signInButtonEvent);
         signInButton.addClickShortcut(Key.ENTER);
+        signInButton.setEnabled(false);
     }
 
     private void setFormForPreviousPageButton() {
@@ -153,5 +161,67 @@ public class CustomerRegistrationPage extends Div {
         previousPageButton.addClassName("previous-page-button");
         previousPageButton.setIcon(new Icon(ANGLE_DOUBLE_LEFT));
         previousPageButton.addClickListener(event -> previousPage());
+    }
+
+    private void setFormForTermsOfServicesButton() {
+        termsOfServicesButton = new Button();
+        termsOfServicesButton.setText("Terms Of Services");
+        termsOfServicesButton.addClickListener(this::termsOfServicesButtonEvent);
+    }
+
+    private void termsOfServicesButtonEvent(ClickEvent<Button> event) {
+        openContentDialog();
+    }
+
+    private void openContentDialog() {
+        setFormForContentDialog();
+
+        contentDialog.open();
+        contentDialog.setCloseOnOutsideClick(true);
+    }
+
+    private void setFormForContentDialog() {
+        setFormForContentText();
+        setFormForAcceptTextField();
+        setFormForAcceptButton();
+
+        contentDialog = new Dialog();
+        contentDialog.setCloseOnOutsideClick(true);
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout(contentText);
+        VerticalLayout verticalLayout = new VerticalLayout(horizontalLayout);
+        contentDialog.add(verticalLayout);
+        contentDialog.add(acceptTextField);
+        contentDialog.add(acceptButton);
+    }
+
+    private void setFormForAcceptTextField() {
+        acceptTextField = new TextField();
+        acceptTextField.setPlaceholder("I accept");
+        acceptTextField.setLabel("More then captcha..");
+    }
+
+    private void setFormForAcceptButton() {
+        acceptButton = new Button("Verify");
+        acceptButton.addClickListener(this::acceptButtonEvent);
+    }
+
+    private void acceptButtonEvent(ClickEvent<Button> event) {
+        if (acceptTextField.isEmpty()) {
+            Notification.show("Accept terms!");
+        } else {
+            if (acceptTextField.getValue().contains("I accept")) {
+                signInButton.addClickListener(this::signInButtonEvent);
+                signInButton.setEnabled(true);
+                contentDialog.close();
+            } else {
+                Notification.show("Don't take a shortcut");
+            }
+        }
+    }
+
+    private void setFormForContentText() {
+        String loripsum = client.getLoripsum();
+        contentText = new Text(loripsum);
     }
 }

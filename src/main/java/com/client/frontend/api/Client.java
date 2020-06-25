@@ -123,4 +123,9 @@ public class Client {
         Operation[] operations = restTemplate.getForObject(clientApi + "/operations", Operation[].class);
         return Arrays.asList(operations);
     }
+
+    public String getLoripsum() {
+        String loripsums = restTemplate.getForObject(clientApi + "/content", String.class);
+        return loripsums;
+    }
 }
