@@ -10,3 +10,5 @@ _Steps:_
  java version: `1.8.0_252`
  
  vaadin version: `14.2.0`
+ 
+ Ps. prefectly works on 4:3 aspect ratio(1280x1024), on 16:9 (1920x1080) some buttons disappear xD
